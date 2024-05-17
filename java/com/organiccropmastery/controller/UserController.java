@@ -147,6 +147,29 @@ public class UserController {
 		return mv;
 	}
 	
+	
+	@PostMapping("/usermobilelogin")
+	public ModelAndView loginAdminMobile(HttpServletRequest request, @RequestParam String mobileNumber) {
+		ModelAndView mv = new ModelAndView();
+		User user=this.userResource.loginUserMobile(mobileNumber);
+		if(user != null) {
+			HttpSession session = request.getSession();
+			session.setAttribute("active-user", user.getFirstname());
+			session.setAttribute("user-login","user");
+			mv.addObject("status", user.getFirstname()+" Successfully Logged in as user");
+			mv.setViewName("index");
+			LOG.info("Logged in as USER");
+		}
+		
+		else {
+			mv.addObject("status"," Failed to Login as User");
+			mv.setViewName("userlogin");
+			LOG.info("Failed to login as USER");
+		}
+		
+		return mv;
+	}
+	
 	@GetMapping("/onion")
 	public String goToOnionPage() {
 		LOG.info("Redirecting to Onion crop Page.");

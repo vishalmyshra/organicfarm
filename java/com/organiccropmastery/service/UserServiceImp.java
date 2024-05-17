@@ -10,15 +10,15 @@ import com.organiccropmastery.model.User;
 
 @Service
 public class UserServiceImp implements UserService {
-	
+
 	@Autowired
 	private UserDao userDao;
 
 	@Override
 	public User getUserById(int id) {
-        Optional<User> optional = userDao.findById(id);
-		
-		if(optional.isPresent())
+		Optional<User> optional = userDao.findById(id);
+
+		if (optional.isPresent())
 			return optional.get();
 		else
 			return null;
@@ -57,6 +57,12 @@ public class UserServiceImp implements UserService {
 	@Override
 	public User getUserByEmail(String emailId) {
 		return userDao.findByEmailid(emailId);
+	}
+
+	@Override
+	public User loginUserMobile(String mobileNumber) {
+
+		return userDao.findByMobile(mobileNumber);
 	}
 
 }

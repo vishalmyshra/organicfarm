@@ -45,6 +45,9 @@ public class UserResource {
 		return userService.loginUser(username, password);
 	}
 	
+	public User loginUserMobile(String mobileNumber) {
+		return userService.loginUserMobile(mobileNumber);
+	}
 	public Long getCountUsers() {
 		return userService.getCountOfUser();
 	}

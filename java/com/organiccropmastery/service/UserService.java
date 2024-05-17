@@ -14,5 +14,6 @@ public interface UserService {
 	User loginUser(String username, String password);
 	Long getCountOfUser();
 	User getUserByEmail(String emailId);
+	User loginUserMobile(String mobileNumber);
 
 }
