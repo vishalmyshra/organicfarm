@@ -94,3 +94,10 @@ const initPayment = () => {
         }
     });
 };
+
+
+//hadleRedirection to html pages
+
+const redirectToOtpLoginController = () => {
+    window.location.href = "usermobileloginpage";
+}
