@@ -73,6 +73,7 @@
                             // if (trueUser) {
                             //loginUserMobile();
                             // }
+                            otpGenerated = true;
                             console.log("Otp Generated");
                         },
                         error: function (error) {
@@ -84,6 +85,7 @@
 
             function validateOTP() {
                 // Logic to validate OTP
+                var otp = document.getElementById("otp").value;
                 if (!otpGenerated) {
                     alert("Generate OTP first");
                     return;
