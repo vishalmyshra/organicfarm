@@ -154,29 +154,41 @@ private static Logger logger  = LoggerFactory.getLogger(UserController.class);
 	}
 	
 	
-	  @PostMapping("/usermobilelogin")
+	 @PostMapping("/usermobilelogin")
 	    public ResponseEntity<Object> loginAdminMobile(HttpServletRequest request, @RequestParam String mobileNumber) {
-	        User user = this.userResource.loginUserMobile(mobileNumber);
+	        User user = loginUserMobile(mobileNumber);
 	        if (user != null) {
-	            // Create a session
 	            HttpSession session = request.getSession();
-	            // Store user information in the session
-	            session.setAttribute("active-user", user);
-	            session.setAttribute("user-login", "user");
-
-	            // Create a JSON response with the redirect URL
-	            JSONObject response = new JSONObject();
-	            response.put("status", "Success");
-	            response.put("redirectURL", "successmobileindex");
-	            return ResponseEntity.ok(response.toString());
+	            storeUserInSession(session, user);
+	            return ResponseEntity.ok(buildSuccessResponse());
 	        } else {
-	            // Return a JSON response with an error message
-	            JSONObject response = new JSONObject();
-	            response.put("status", "Error");
-	            response.put("message", "Failed to login as user");
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response.toString());
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildErrorResponse());
 	        }
 	    }
+
+	    private User loginUserMobile(String mobileNumber) {
+	        return userResource.loginUserMobile(mobileNumber);
+	    }
+
+	    private void storeUserInSession(HttpSession session, User user) {
+	        session.setAttribute("active-user", user);
+	        session.setAttribute("user-login", "user");
+	    }
+
+	    private String buildSuccessResponse() {
+	        JSONObject response = new JSONObject();
+	        response.put("status", "Success");
+	        response.put("redirectURL", "successmobileindex");
+	        return response.toString();
+	    }
+
+	    private String buildErrorResponse() {
+	        JSONObject response = new JSONObject();
+	        response.put("status", "Error");
+	        response.put("message", "Failed to login as user");
+	        return response.toString();
+	    }
+	
 	
 	@GetMapping("/onion")
 	public String goToOnionPage() {

@@ -7,7 +7,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.Console;
-import java.util.Random;
+
+import java.util.*;
+import java.util.Date;
+import java.sql.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,12 +35,12 @@ public class OTPController {
 	boolean testOtpFeature = false;
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	private UserServiceImp userServiceImp;
-	
+
 	private final OTPDao otpDao;
-	
+
 	public OTPController(OTPDao otpDao) {
 		this.otpDao = otpDao;
 	}
@@ -50,24 +53,20 @@ public class OTPController {
 		try {
 			OTPServiceImpl otpServiceImpl = new OTPServiceImpl(otpDao);
 			Random random = new Random();
-			
-			
-			
+
 			GeneratedOTP generatedOTP = new GeneratedOTP();
 			int randomNumber = random.nextInt(900000) + 100000; // Generates a random number between 100000 and 999999
 			// Ensure the random number is exactly 6 digits long
 			String formattedRandomNumber = String.format("%06d", randomNumber);
 
-			
 			String numberUser = mobileNumberDto.getMobileNumber();
-			User user =  userServiceImp.loginUserMobile(numberUser);
+			User user = userServiceImp.loginUserMobile(numberUser);
 			System.out.println("User mobile number ->" + numberUser);
 			System.out.println("Generated OTP -> " + formattedRandomNumber);
 
 			// Prepare request body
-			String requestBody = "{\"route\":\"otp\",\"variables_values\":\"" + formattedRandomNumber + "\",\"numbers\":\"" + numberUser + "\"}";
-			
-			
+			String requestBody = "{\"route\":\"otp\",\"variables_values\":\"" + formattedRandomNumber
+					+ "\",\"numbers\":\"" + numberUser + "\"}";
 
 			// Prepare request headers
 			HttpHeaders headers = new HttpHeaders();
@@ -77,6 +76,11 @@ public class OTPController {
 
 			// Create HTTP entity with headers and body
 			HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+			// Get current time
+			Date date = new Date();
+
+			// Convert to timestamp
+			Timestamp timestamp = new Timestamp(date.getTime());
 
 			if (testOtpFeature) {
 				// Call the third-party API endpoint
@@ -87,14 +91,16 @@ public class OTPController {
 				generatedOTP.setUsername(user.getUsername());
 				generatedOTP.setMobileNumber(numberUser);
 				generatedOTP.setOtp(formattedRandomNumber);
+				generatedOTP.setOtpTimeStamp(timestamp);
 				generatedOTP.setStatus(responseEntity.getStatusCode().toString());
 				otpServiceImpl.saveOTP(generatedOTP);
 			} else {
 				response = "Testing otp with dummy call.";
 				responsStatus = HttpStatus.CONTINUE;
-				generatedOTP.setUsername("dummy-user"+formattedRandomNumber + "");
+				generatedOTP.setUsername("dummy-user" + formattedRandomNumber + "");
 				generatedOTP.setMobileNumber(numberUser);
 				generatedOTP.setOtp(formattedRandomNumber);
+				generatedOTP.setOtpTimeStamp(timestamp);
 				generatedOTP.setStatus("200");
 				System.out.println(generatedOTP.toString());
 				otpServiceImpl.saveOTP(generatedOTP);
